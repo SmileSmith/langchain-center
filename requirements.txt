@@ -2,4 +2,10 @@ llama-index
 langchain
 gradio
 openai
+google-search-results
+unstructured
+chromadb
+pinecone-client
+youtube-transcript-api
+pytube
 python-dotenv

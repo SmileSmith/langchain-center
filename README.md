@@ -4,6 +4,8 @@
 
 ## 参考资料
 
+https://serpapi.com/
+
 [https://github.com/vlsimple/chat-langchain-nb/](https://github.com/vlsimple/chat-langchain-nb/)
 
 [https://www.bilibili.com/read/cv23216734](https://www.bilibili.com/read/cv23216734)

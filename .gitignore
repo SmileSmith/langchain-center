@@ -1,4 +1,8 @@
+# 项目特殊
 .env
+.chroma
+stores
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
