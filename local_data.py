@@ -2,16 +2,23 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import Chroma
 from langchain.text_splitter import CharacterTextSplitter
 from langchain import OpenAI,VectorDBQA
-from langchain.document_loaders import DirectoryLoader
+from langchain.document_loaders import DirectoryLoader, UnstructuredMarkdownLoader
 from langchain.chains import RetrievalQA
 from dotenv.main import load_dotenv
 import os
-import sys
-import logging
+import ssl
+
+# 解决NLTK下载报错问题
+try:
+    _create_unverified_https_context = ssl._create_unverified_context
+except AttributeError:
+    pass
+else:
+    ssl._create_default_https_context = _create_unverified_https_context
 
 # 记录日志
-logging.basicConfig(stream=sys.stdout, level=logging.INFO)
-logging.getLogger().addHandler(logging.StreamHandler(stream=sys.stdout))
+# logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+# logging.getLogger().addHandler(logging.StreamHandler(stream=sys.stdout))
 
 load_dotenv()
 
@@ -22,7 +29,7 @@ persist_dir="stores"
 
 def construct_vectorstore(docs_path, vectorstore_path):
     # 加载文件夹中的所有txt类型的文件
-    loader = DirectoryLoader(docs_path, glob='**/*.md')
+    loader = DirectoryLoader(docs_path, glob='**/*.md', loader_cls=UnstructuredMarkdownLoader)
     # 将数据转成 document 对象，每个文件会作为一个 document
     documents = loader.load()
 
