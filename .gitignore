@@ -1,4 +1,5 @@
 # 项目特殊
+.vscode
 .env
 .chroma
 stores

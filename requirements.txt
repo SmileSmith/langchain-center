@@ -9,3 +9,4 @@ pinecone-client
 youtube-transcript-api
 pytube
 python-dotenv
+selective-context
