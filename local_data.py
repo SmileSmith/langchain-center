@@ -5,6 +5,7 @@ from langchain import OpenAI,VectorDBQA
 from langchain.document_loaders import DirectoryLoader, UnstructuredMarkdownLoader
 from langchain.chains import RetrievalQA
 from dotenv.main import load_dotenv
+import gradio as gr
 import os
 import ssl
 
@@ -34,7 +35,7 @@ def construct_vectorstore(docs_path, vectorstore_path):
     documents = loader.load()
 
     # 初始化加载器
-    text_splitter = CharacterTextSplitter(chunk_size=500, chunk_overlap=0)
+    text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
     # 切割加载的 document
     split_docs = text_splitter.split_documents(documents)
 
@@ -50,16 +51,27 @@ def construct_vectorstore(docs_path, vectorstore_path):
 # 将 document 通过 openai 的 embeddings 对象计算 embedding向量信息并临时存入 Chroma 向量数据库，用于后续匹配查询
 docsearch = construct_vectorstore(docs_dir, persist_dir)
 
-query="HiBox如何安装"
 
-# 测试向量化匹配
-search_result = docsearch.similarity_search_with_score(query)
-print(search_result)
+def vearch(input_text):
+    print("======================")
+    print(input_text)
+    print("----------------------")
+    # 测试向量化匹配
+    search_result = docsearch.similarity_search_with_score(input_text)
+    print(search_result)
+    print("----------------------")
+    # 测试MMR
+    retriever = docsearch.as_retriever(search_type="mmr")
+    retrieve_result = retriever.get_relevant_documents(input_text)
+    print(retrieve_result)
+    print("======================")
+    return search_result[0][0].page_content, retrieve_result[0].page_content
 
-# 测试MMR
-retriever = docsearch.as_retriever(search_type="mmr")
-retrieve_result = retriever.get_relevant_documents(query)
-print(retrieve_result)
+webui = gr.Interface(fn=vearch,
+                     inputs=gr.components.Textbox(lines=7, label="输入您的文本"),
+                     outputs=[gr.components.Text(label="相似度匹配结果"), gr.components.Text(label="MMR匹配结果")],
+                     title="AI 向量化匹配")
+webui.launch(share=True)
 
 # 创建问答对象
 # qa = VectorDBQA.from_chain_type(llm=OpenAI(temperature=0, max_tokens=2048, openai_api_key=openai_api_key), chain_type="stuff", vectorstore=docsearch, return_source_documents=True)
